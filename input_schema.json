@@ -1,0 +1,25 @@
+{
+  "numerical": {
+    "loan_amnt": {"type": "float", "min": 0},
+    "int_rate": {"type": "float", "min": 0, "max": 100},
+    "installment": {"type": "float", "min": 0},
+    "annual_inc": {"type": "float", "min": 0},
+    "dti": {"type": "float", "min": 0, "max": 100},
+    "delinq_2yrs": {"type": "int", "min": 0},
+    "inq_last_6mths": {"type": "int", "min": 0},
+    "open_acc": {"type": "int", "min": 0},
+    "pub_rec": {"type": "int", "min": 0},
+    "revol_bal": {"type": "float", "min": 0},
+    "revol_util": {"type": "float", "min": 0, "max": 100},
+    "total_acc": {"type": "int", "min": 0}
+  },
+  "categorical": {
+    "term": {"choices": ["36 months", "60 months"]},
+    "grade": {"choices": ["A","B","C","D","E","F","G"]},
+    "emp_length": {"choices": ["< 1 year","1 year","2 years","3 years","4 years","5 years","6 years","7 years","8 years","9 years","10+ years"]},
+    "home_ownership": {"choices": ["MORTGAGE","RENT","OWN","OTHER"]},
+    "purpose": {"choices": ["debt_consolidation","credit_card","home_improvement","major_purchase","small_business","car","medical","vacation","moving","house","other"]},
+    "addr_state": {"choices": ["AL","AK","AZ","AR","CA","CO","CT","DC","DE","FL","GA","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VA","VT","WA","WI","WV","WY"]}
+  },
+  "label_optional": "loan_status"
+}
