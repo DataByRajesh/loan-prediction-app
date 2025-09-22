@@ -35,3 +35,26 @@ docker run --rm -p 8501:8501 \
 ```
 
 Then open http://localhost:8501
+
+## Deploy to Google Cloud Run
+
+Prereqs:
+- Install gcloud and authenticate (`gcloud auth login` and `gcloud config set project <PROJECT_ID>`)
+- Push container to Artifact Registry or use Cloud Build
+
+Build and deploy with Cloud Build + Cloud Run:
+```bash
+gcloud builds submit --tag "${REGION}-docker.pkg.dev/${PROJECT_ID}/loan-default/loan-default-app:latest"
+gcloud run deploy loan-default-app \
+  --image "${REGION}-docker.pkg.dev/${PROJECT_ID}/loan-default/loan-default-app:latest" \
+  --region ${REGION} \
+  --platform managed \
+  --allow-unauthenticated \
+  --set-env-vars MODEL_DIR=model,APP_NAME=loan-default-app \
+  --set-env-vars MODEL_URL="gs://<bucket>/<path>/model.zip"
+```
+
+Notes:
+- `MODEL_URL` supports `gs://...` (GCS), Google Drive links, or generic HTTP(S).
+- Service account running the Cloud Run service must have `storage.objects.get` on the model object if using GCS.
+- The Docker image respects `$PORT` for Cloud Run.

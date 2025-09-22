@@ -80,6 +80,27 @@ def _gdown_download(url: str, out_path: str):
     import gdown
     gdown.download(url, out_path, quiet=False, fuzzy=True)
 
+def _gcs_download(gs_uri: str, out_path: str):
+    # gs://bucket/path/to/object
+    try:
+        if not gs_uri.startswith("gs://"):
+            raise ValueError("Not a GCS URI")
+        without_scheme = gs_uri[5:]
+        parts = without_scheme.split("/", 1)
+        if len(parts) != 2 or not parts[0] or not parts[1]:
+            raise ValueError("Invalid GCS URI format; expected gs://<bucket>/<object>")
+        bucket_name, blob_name = parts[0], parts[1]
+        from google.cloud import storage
+        client = storage.Client()
+        bucket = client.bucket(bucket_name)
+        blob = bucket.blob(blob_name)
+        if not blob.exists():
+            raise FileNotFoundError(f"GCS object not found: {gs_uri}")
+        os.makedirs(os.path.dirname(out_path), exist_ok=True)
+        blob.download_to_filename(out_path)
+    except Exception as e:
+        raise RuntimeError(f"GCS download failed for {gs_uri}: {e}")
+
 def ensure_model_present(model_dir: str) -> None:
     # If already there, return
     if os.path.isdir(model_dir) and os.path.isdir(os.path.join(model_dir, "metadata")) and os.path.isdir(os.path.join(model_dir, "stages")):
@@ -92,9 +113,11 @@ def ensure_model_present(model_dir: str) -> None:
     tmp = tempfile.mkdtemp()
     archive_path = os.path.join(tmp, "model_archive")
 
-    # Download (Drive or generic HTTP)
+    # Download (GCS, Drive, or generic HTTP)
     try:
-        if "drive.google.com" in model_url or "id=" in model_url:
+        if model_url.startswith("gs://"):
+            _gcs_download(model_url, archive_path)
+        elif "drive.google.com" in model_url or "id=" in model_url:
             _gdown_download(model_url, archive_path)
         else:
             r = requests.get(model_url, stream=True, timeout=300)

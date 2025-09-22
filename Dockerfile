@@ -24,5 +24,7 @@ ENV MODEL_DIR=model
 
 EXPOSE 8501
 
-CMD ["bash", "-lc", "streamlit run streamlit_app.py --server.port=8501 --server.address=0.0.0.0"]
+# Cloud Run provides $PORT
+ENV PORT=8501
+CMD ["bash", "-lc", "streamlit run streamlit_app.py --server.port=${PORT} --server.address=0.0.0.0"]
 
