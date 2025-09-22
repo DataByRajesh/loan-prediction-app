@@ -17,3 +17,21 @@ The app downloads your zipped Spark `PipelineModel` from MODEL_URL on first run,
 - Loan Officer form
 - CSV upload
 - JSON row
+
+## Run with Docker (local)
+
+Build image:
+```bash
+docker build -t loan-default-app .
+```
+
+Run (provide MODEL_URL if no `model/` directory is present):
+```bash
+docker run --rm -p 8501:8501 \
+  -e MODEL_URL="https://<your-model-archive>" \
+  -e MODEL_DIR="model" \
+  --name loan-default-app \
+  loan-default-app
+```
+
+Then open http://localhost:8501
