@@ -1,4 +1,4 @@
-THIS SHOULD BE A LINTER ERRORimport os
+import os
 from typing import List
 
 from pyspark.sql import SparkSession, DataFrame
