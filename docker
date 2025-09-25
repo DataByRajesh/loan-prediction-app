@@ -1,0 +1,53 @@
+# Use official Python image
+FROM python:3.11-slim
+
+# ------------------------
+# Install Java (required by PySpark) and curl
+# ------------------------
+RUN apt-get update && \
+    apt-get install -y openjdk-11-jdk curl unzip && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+ENV PATH=$JAVA_HOME/bin:$PATH
+
+# ------------------------
+# Install PySpark
+# ------------------------
+RUN pip install --no-cache-dir pyspark==3.5.0 fastapi uvicorn[standard] \
+    google-cloud-storage==2.14.0 google-cloud-bigquery==3.10.0 pydantic==2.3.0
+
+# ------------------------
+# Download GCS Hadoop Connector
+# ------------------------
+RUN curl -Lo /opt/gcs-connector.jar https://storage.googleapis.com/hadoop-lib/gcs/gcs-connector-hadoop3-latest.jar
+
+# ------------------------
+# Set working directory
+# ------------------------
+WORKDIR /app
+
+# ------------------------
+# Copy code
+# ------------------------
+COPY . /
+
+# ------------------------
+# Install dependencies
+# ------------------------
+RUN pip install --no-cache-dir -r requirements.txt
+
+# ------------------------
+# Expose port for FastAPI
+# ------------------------
+EXPOSE 8080
+
+# ------------------------
+# Set Spark options to use GCS connector
+# ------------------------
+ENV SPARK_SUBMIT_OPTIONS="--jars /opt/gcs-connector.jar"
+
+# ------------------------
+# Run FastAPI with Uvicorn
+# ------------------------
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
