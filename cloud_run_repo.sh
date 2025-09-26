@@ -9,12 +9,10 @@ REPO_NAME="loan-prediction-repo"
 
 # Backend
 BACKEND_NAME="loan-prediction-api"
-BACKEND_DIR="./backend"
 BACKEND_IMAGE="us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$BACKEND_NAME:latest"
 
 # Frontend
 FRONTEND_NAME="loan-officer-ui"
-FRONTEND_DIR="./ui"
 FRONTEND_IMAGE="us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$FRONTEND_NAME:latest"
 
 # ==========================
@@ -38,7 +36,7 @@ gcloud artifacts repositories create $REPO_NAME \
 # BUILD & PUSH BACKEND IMAGE
 # ==========================
 echo "🚀 Building backend Docker image..."
-docker build -t gcr.io/default-prediction-472915/loan-prediction-app -f Dockerfile .
+docker build -t $BACKEND_IMAGE -f Dockerfile.backend .
 
 echo "📤 Pushing backend image to Artifact Registry..."
 docker push $BACKEND_IMAGE
@@ -60,7 +58,7 @@ echo "✅ Backend deployed at: $BACKEND_URL"
 # BUILD & PUSH FRONTEND IMAGE
 # ==========================
 echo "🚀 Building frontend Docker image..."
-docker build -t gcr.io/default-prediction-472915/loan-prediction-app -f Dockerfile .
+docker build -t $FRONTEND_IMAGE -f Dockerfile.frontend .
 
 echo "📤 Pushing frontend image to Artifact Registry..."
 docker push $FRONTEND_IMAGE
@@ -74,7 +72,7 @@ gcloud run deploy $FRONTEND_NAME \
   --platform managed \
   --region $REGION \
   --allow-unauthenticated \
-  --set-env-vars "API_URL=$BACKEND_URL/predict"
+  --set-env-vars "API_URL=$BACKEND_URL"
 
 FRONTEND_URL=$(gcloud run services describe $FRONTEND_NAME --region $REGION --format 'value(status.url)')
 echo "✅ Frontend deployed at: $FRONTEND_URL"

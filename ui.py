@@ -1,9 +1,10 @@
 import streamlit as st
 import pandas as pd
 import requests
+import os
 
 # FastAPI backend URL (Cloud Run or local)
-API_URL = "https://your-fastapi-service-url/predict"
+API_BASE = os.environ.get("API_URL", "http://localhost:8080")
 
 st.set_page_config(page_title="Loan Officer Dashboard", layout="wide")
 st.title("Loan Default Prediction - Officer Dashboard")
@@ -46,7 +47,7 @@ if st.button("Predict Single Applicant"):
         "cb_person_cred_hist_length": cb_person_cred_hist_length
     }
     try:
-        response = requests.post(API_URL, json=payload)
+        response = requests.post(API_BASE + "/predict", json=payload)
         if response.status_code==200:
             result = response.json()
             colors = {"A":"#00FF00","B":"#66FF66","C":"#FFFF66","D":"#FFCC66","E":"#FF9966","F":"#FF6666","G":"#FF0000"}
@@ -68,7 +69,7 @@ if uploaded_file is not None:
     batch_df = pd.read_csv(uploaded_file)
     if st.button("Predict Batch"):
         try:
-            response = requests.post(API_URL, json=batch_df.to_dict(orient="records"))
+            response = requests.post(API_BASE + "/predict_batch", json=batch_df.to_dict(orient="records"))
             if response.status_code==200:
                 results = response.json()["results"]
                 batch_df["prediction"] = [r["prediction"] for r in results]
