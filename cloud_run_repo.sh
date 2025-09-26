@@ -38,7 +38,7 @@ gcloud artifacts repositories create $REPO_NAME \
 # BUILD & PUSH BACKEND IMAGE
 # ==========================
 echo "🚀 Building backend Docker image..."
-docker build -t $BACKEND_IMAGE $BACKEND_DIR
+docker build -t gcr.io/default-prediction-472915/loan-prediction-app -f Dockerfile .
 
 echo "📤 Pushing backend image to Artifact Registry..."
 docker push $BACKEND_IMAGE
@@ -60,7 +60,7 @@ echo "✅ Backend deployed at: $BACKEND_URL"
 # BUILD & PUSH FRONTEND IMAGE
 # ==========================
 echo "🚀 Building frontend Docker image..."
-docker build -t $FRONTEND_IMAGE $FRONTEND_DIR
+docker build -t gcr.io/default-prediction-472915/loan-prediction-app -f Dockerfile .
 
 echo "📤 Pushing frontend image to Artifact Registry..."
 docker push $FRONTEND_IMAGE
